@@ -1,0 +1,16 @@
+name: Gloire
+version: ${project.version}
+main: qowax.gloire.Gloire
+prefix: Gloire
+authors: [ qowax ]
+website: nathan.haudot@outlook.fr
+
+commands:
+  gloire:
+    description: Description gloire
+    usage: /<command>
+    permission: gloire.top
+  topp:
+    description: Description gloire
+    usage: /<command>
+    permission: gloire.top
