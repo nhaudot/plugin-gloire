@@ -1,0 +1,19 @@
+<project name="MyProject" default="init" basedir="../..">
+    <description>
+        Increment build variable
+    </description>
+    <!-- set global properties for this build -->
+    <property name="src" location="../"/>
+
+    <target name="init">
+        <echo file="antout.txt">ANT ${src} ${line.separator}</echo>
+
+        <buildnumber/>
+        <replaceregexp file="${src}/src/main/java/qowax/gloire/Gloire.java"
+                       match="public\s+static\s+final\s+String\s+BUILD_NUMBER\s+=\s+&quot;.*&quot;;"
+                       replace="public static final String BUILD_NUMBER = &quot;${build.number}&quot;;"
+                       byline="true"
+        />
+
+    </target>
+</project>

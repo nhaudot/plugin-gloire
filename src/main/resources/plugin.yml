@@ -7,10 +7,6 @@ website: nathan.haudot@outlook.fr
 
 commands:
   gloire:
-    description: Description gloire
+    description: Savoir combien de gloire le joueur possède
     usage: /<command>
-    permission: gloire.top
-  topp:
-    description: Description gloire
-    usage: /<command>
-    permission: gloire.top
+    permission: gloire.gloire
