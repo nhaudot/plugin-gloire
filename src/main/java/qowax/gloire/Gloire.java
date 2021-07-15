@@ -3,6 +3,8 @@ package qowax.gloire;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
+import qowax.gloire.Listeners.EventListener;
+import qowax.gloire.Listeners.MobsListener;
 
 import java.sql.SQLException;
 
@@ -10,10 +12,9 @@ public final class Gloire extends JavaPlugin {
 
     public static final String BUILD_MAJ = "1";
     public static final String BUILD_MIN = "0";
-    public static final String BUILD_NUMBER = "19";
+    public static final String BUILD_NUMBER = "41";
 
     public static Database bdd;
-
     public static Plugin plugin;
 
     @Override
@@ -52,6 +53,7 @@ public final class Gloire extends JavaPlugin {
 
         // Listener
         getServer().getPluginManager().registerEvents(new EventListener(), plugin);
+        getServer().getPluginManager().registerEvents(new MobsListener(), plugin);
     }
 
     @Override

@@ -1,3 +1,4 @@
+# MySQL database configuration
 database:
   host: localhost # Hôte de la base de données
   port: 3306 # Port à utiliser
@@ -5,6 +6,56 @@ database:
   username: minecraft
   password: minecraft
 
+# Plugin configuration
 config:
-  gloire_base: 100 # Le nombre de Gloire qu'un nouveau joueur obtient
-  gloire_creeper: 3 # Le nombre de Gloire obtenus en tuant un Creeper
+  gloire_base: 100 # Nombre de Gloire qu'un nouveau joueur obtient
+
+  gloire_player: 3 # Nombre de Gloire obtenus en tuant un autre joueur
+
+  gloire_creeper: 3 # Nombre de Gloire obtenus en tuant un Creeper
+  gloire_bat: 3
+  gloire_blaze: 3
+  gloire_cave_spider: 3
+  gloire_chicken: 3
+  gloire_cow: 3
+  gloire_donkey: 3
+  gloire_ender_dragon: 3
+  gloire_enderman: 3
+  gloire_endermite: 3
+  gloire_evoker: 3
+  gloire_ghast: 3
+  gloire_giant: 3
+  gloire_guardian: 3
+  gloire_horse: 3
+  gloire_iron_golem: 3
+  gloire_llama: 3
+  gloire_magma_cube: 3
+  gloire_mushroom_cow: 3
+  gloire_ocelot: 3
+  gloire_parrot: 3
+  gloire_pig: 3
+  gloire_pig_zombie: 3
+  gloire_polar_bear: 3
+  gloire_rabbit: 3
+  gloire_sheep: 3
+  gloire_skulker: 3
+  gloire_silverfish: 3
+  gloire_skeleton: 3
+  gloire_skeleton_horse: 3
+  gloire_slime: 3
+  gloire_snowman: 3
+  gloire_spider: 3
+  gloire_squid: 3
+  gloire_stray: 3
+  gloire_vex: 3
+  gloire_villager: 3
+  gloire_witch: 3
+  gloire_wither: 3
+  gloire_wither_skeleton: 3
+  gloire_wolf: 3
+  gloire_zombie: 3
+  gloire_zombie_horse: 3
+  gloire_zombie_villager: 3
+
+
+
