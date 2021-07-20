@@ -1,1 +1,0 @@
-CREATE TABLE `statistiques` (`uuid` text NOT NULL, `joueur` text NOT NULL, `gloire` int(11) NOT NULL) DEFAULT CHARSET=utf8;

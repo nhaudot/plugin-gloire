@@ -74,7 +74,6 @@ public class TopGUI implements Listener {
             String s = result.get(i).replace("-", "");
             UUID playerUUID = new UUID(new BigInteger(s.substring(0, 16), 16).longValue(), new BigInteger(s.substring(16), 16).longValue());
             meta.setOwner(Bukkit.getOfflinePlayer(playerUUID).getName());
-            Bukkit.getLogger().info(Bukkit.getOfflinePlayer(playerUUID).getName());
             meta.setDisplayName(Bukkit.getOfflinePlayer(playerUUID).getName());
             List<String> description = new ArrayList<>();
 

@@ -21,7 +21,7 @@ public final class Gloire extends JavaPlugin {
 
     public static final String BUILD_MAJ = "1";
     public static final String BUILD_MIN = "0";
-    public static final String BUILD_NUMBER = "188";
+    public static final String BUILD_NUMBER = "219";
 
     public static Plugin plugin;
 
@@ -61,9 +61,10 @@ public final class Gloire extends JavaPlugin {
                     ArrayList<String> result = bdd.query("SHOW TABLES LIKE 'statistiques'", true);
                     if (result.size() == 0) {
                         // On doit initialiser la base de données
-                        String sqldump = new Scanner(Gloire.class.getResourceAsStream("/database.sql"), "UTF-8").useDelimiter("\\A").next();
                         getLogger().info("Création de la base de données...");
-                        bdd.query(sqldump, false);
+                        bdd.query("CREATE TABLE `statistiques` (`uuid` text NOT NULL, `joueur` text NOT NULL, `gloire` int(11) NOT NULL) DEFAULT CHARSET=utf8;", false);
+                        bdd.query("CREATE TABLE `config` (`lastReset` datetime NOT NULL) DEFAULT CHARSET=utf8;", false);
+                        bdd.query("INSERT INTO `config` (`lastReset`) VALUES ('2021-07-01 00:00:00');", false);
                         getLogger().info("Base de données ok!");
                     }
                 } catch (SQLException throwables) {

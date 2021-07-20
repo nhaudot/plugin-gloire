@@ -12,7 +12,12 @@ import java.util.Map;
 public enum Rank {
     // PREFIXS
     NONE(Gloire.plugin.getConfig().getString("levels.aucun.prefix")),
-    PREFIX_PODIUM(Gloire.plugin.getConfig().getString("levels.podium.prefix")),
+    // Podium
+    PREFIX_TRANSCENDANT(Gloire.plugin.getConfig().getString("levels.transcendant.prefix")),
+    PREFIX_DIVIN(Gloire.plugin.getConfig().getString("levels.divin.prefix")),
+    PREFIX_LEGENDAIRE(Gloire.plugin.getConfig().getString("levels.legendaire.prefix")),
+    PREFIX_OVERLORD(Gloire.plugin.getConfig().getString("levels.overlord.prefix")),
+    // Standard
     PREFIX_GRAND(Gloire.plugin.getConfig().getString("levels.grand.prefix")),
     PREFIX_IMPITOYABLE(Gloire.plugin.getConfig().getString("levels.impitoyable.prefix")),
     PREFIX_TRIOMPHANT(Gloire.plugin.getConfig().getString("levels.triomphant.prefix")),
@@ -57,11 +62,28 @@ public enum Rank {
                     // Calcul du rang
                     int nombreGloire = Integer.valueOf(result.get(0));
 
-                    Rank playerRank;
+                    Rank playerRank = null;
 
                     if (nombreGloire >= Gloire.LEVEL_PODIUM) {
                         // PODIUM
-                        playerRank = Rank.PREFIX_PODIUM;
+                        ArrayList<String> resultPodium = bdd.query("SELECT `uuid`, `gloire` FROM `statistiques` WHERE `gloire` >= 100000 ORDER BY `gloire` DESC", true);
+                        for(int i = 0 ; i < resultPodium.size(); i+=2) {
+                            if (i == 0 && (player.getUniqueId().toString().equals(resultPodium.get(i)))) {
+                                playerRank = Rank.PREFIX_TRANSCENDANT;
+                                break;
+                            } else if ((i == 2 || i == 4 ) && (player.getUniqueId().toString().equals(resultPodium.get(i)))) {
+                                playerRank = Rank.PREFIX_DIVIN;
+                                break;
+                            } else if ((i == 6 || i == 8 || i == 10 || i == 12 || i == 14) && (player.getUniqueId().toString().equals(resultPodium.get(i)))) {
+                                playerRank = Rank.PREFIX_LEGENDAIRE;
+                                break;
+                            } else if ((i == 16 || i == 18 || i == 20 || i == 22 || i == 24 || i == 26 || i == 28) && (player.getUniqueId().toString().equals(resultPodium.get(i)))) {
+                                playerRank = Rank.PREFIX_OVERLORD;
+                                break;
+                            } else {
+                                playerRank = Rank.PREFIX_GRAND;
+                            }
+                        }
                     } else if (nombreGloire < Gloire.LEVEL_PODIUM && nombreGloire >= Gloire.LEVEL_GRAND) {
                         // GRAND
                         playerRank = Rank.PREFIX_GRAND;
@@ -107,7 +129,24 @@ public enum Rank {
 
             if (nombreGloire >= Gloire.LEVEL_PODIUM) {
                 // PODIUM
-                playerRank = Rank.PREFIX_PODIUM;
+                ArrayList<String> resultPodium = bdd.query("SELECT `uuid`, `gloire` FROM `statistiques` WHERE `gloire` >= 100000 ORDER BY `gloire` DESC", true);
+                for(int i = 0 ; i < resultPodium.size(); i+=2) {
+                    if (i == 0 && (player.getUniqueId().toString().equals(resultPodium.get(i)))) {
+                        playerRank = Rank.PREFIX_TRANSCENDANT;
+                        break;
+                    } else if ((i == 2 || i == 4 ) && (player.getUniqueId().toString().equals(resultPodium.get(i)))) {
+                        playerRank = Rank.PREFIX_DIVIN;
+                        break;
+                    } else if ((i == 6 || i == 8 || i == 10 || i == 12 || i == 14) && (player.getUniqueId().toString().equals(resultPodium.get(i)))) {
+                        playerRank = Rank.PREFIX_LEGENDAIRE;
+                        break;
+                    } else if ((i == 16 || i == 18 || i == 20 || i == 22 || i == 24 || i == 26 || i == 28) && (player.getUniqueId().toString().equals(resultPodium.get(i)))) {
+                        playerRank = Rank.PREFIX_OVERLORD;
+                        break;
+                    } else {
+                        playerRank = Rank.PREFIX_GRAND;
+                    }
+                }
             } else if (nombreGloire < Gloire.LEVEL_PODIUM && nombreGloire >= Gloire.LEVEL_GRAND) {
                 // GRAND
                 playerRank = Rank.PREFIX_GRAND;

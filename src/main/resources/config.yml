@@ -8,7 +8,7 @@ database:
 
 # Configuration timer
 timer:
-  schedule_check: 50 # Nombre de ticks à chaque check du timer (1200 = 1 minute)
+  schedule_check: 1200 # Nombre de ticks à chaque check du timer (1200 = 1 minute)
 
 # Plugin configuration
 config:
@@ -62,20 +62,27 @@ config:
 
 # Configuration des niveaux
 levels:
+  transcendant:
+    prefix: '&c[TRANSCENDANT]&f'
+  divin:
+    prefix: '&d[DIVIN]&f'
+  legendaire:
+    prefix: '&5[LEGENDAIRE]&f'
+  overlord:
+    prefix: '&6[OVERLORD]&f'
   podium:
-    value: 100000
-    prefix: '&b[PODIUM]&f'
+    value: 100000 # Nombre de gloire requis pour accéder aux rangs sans palier
   grand:
     value: 50000
-    prefix: '&6[GRAND]&f'
+    prefix: '&e[GRAND]&f'
   impitoyable:
     value: 25000
-    prefix: '&5[IMPITOYABLE]&f'
+    prefix: '&3[IMPITOYABLE]&f'
   triomphant:
     value: 10000
-    prefix: '&1[TRIOMPHANT]&f'
+    prefix: '&2[TRIOMPHANT]&f'
   temeraire:
     value: 5000
-    prefix: '&2[TEMERAIRE]&f'
+    prefix: '&a[TEMERAIRE]&f'
   aucun:
     prefix: ''
