@@ -10,22 +10,26 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
 import java.sql.SQLException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 
 public class CommandGloire implements CommandExecutor {
 
-    private Database bdd;
     private Plugin plugin;
     public Player player;
 
-    public CommandGloire(Database _bdd, Plugin _plugin) {
-        bdd = _bdd;
+    public CommandGloire(Plugin _plugin) {
         plugin = _plugin;
     }
 
     // Commande /gloire
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+
+        // Commandes joueur
         if (sender instanceof Player) {
             player = (Player) sender;
 
@@ -36,7 +40,13 @@ public class CommandGloire implements CommandExecutor {
                     @Override
                     public void run() {
                         try {
-                            ArrayList<String> result = bdd.sendRequest("SELECT `gloire` FROM `statistiques` WHERE `uuid` = '" + player.getUniqueId() + "'");
+                            Database bdd = new Database(plugin.getConfig().getString("database.host"),
+                                    Integer.parseInt(plugin.getConfig().getString("database.port")),
+                                    plugin.getConfig().getString("database.database"),
+                                    plugin.getConfig().getString("database.username"),
+                                    plugin.getConfig().getString("database.password"));
+
+                            ArrayList<String> result = bdd.query("SELECT `gloire` FROM `statistiques` WHERE `uuid` = '" + player.getUniqueId() + "'", true);
                             sender.sendMessage("Vous avez " + result.get(0) + " gloires");
                         } catch (SQLException throwables) {
                             throwables.printStackTrace();
@@ -46,16 +56,16 @@ public class CommandGloire implements CommandExecutor {
             }
             // /GLOIRE TOP
             else if (args[0].equalsIgnoreCase("top")) {
-                TopGUI monGui = new TopGUI(bdd);
+                TopGUI monGui = new TopGUI(plugin);
 
                 // Ouverture GUI
                 monGui.openInventory((HumanEntity) sender);
             }
-            // /GLOIRE ADD <joueur< <montant>
+            // /GLOIRE ADD/REMOVE <joueur> <montant>
             else if (args[0].equalsIgnoreCase("add") || args[0].equalsIgnoreCase("remove")) {
 
                 if (args.length <= 2 || args.length >= 4) {
-                    player.sendMessage("Erreur de syntaxe: /gloire add <joueur> <montant>");
+                    player.sendMessage("Erreur de syntaxe: /gloire add/remove <joueur> <montant>");
                 }
                 else
                 {
@@ -65,16 +75,33 @@ public class CommandGloire implements CommandExecutor {
                             @Override
                             public void run() {
                                 try {
-                                    ArrayList<String> result = bdd.sendRequest("SELECT `gloire` FROM `statistiques` WHERE `uuid` = '" + Bukkit.getOfflinePlayer(args[1]).getUniqueId() + "'");
+                                    Database bdd = new Database(plugin.getConfig().getString("database.host"),
+                                            Integer.parseInt(plugin.getConfig().getString("database.port")),
+                                            plugin.getConfig().getString("database.database"),
+                                            plugin.getConfig().getString("database.username"),
+                                            plugin.getConfig().getString("database.password"));
+                                    ArrayList<String> result = bdd.query("SELECT `gloire` FROM `statistiques` WHERE `uuid` = '" + Bukkit.getOfflinePlayer(args[1]).getUniqueId() + "'", true);
                                     if (result.size() != 0) {
                                         int nouveauGloire = 0;
                                         if (args[0].equalsIgnoreCase("add")) {
                                             nouveauGloire = Integer.parseInt(result.get(0)) + Integer.parseInt(args[2]);
-                                            bdd.executeQuery("UPDATE `statistiques` SET `gloire`='" + String.valueOf(nouveauGloire) + "' WHERE `uuid` = '" + Bukkit.getOfflinePlayer(args[1]).getUniqueId() + "'");
+                                            bdd.query("UPDATE `statistiques` SET `gloire`='" + String.valueOf(nouveauGloire) + "' WHERE `uuid` = '" + Bukkit.getOfflinePlayer(args[1]).getUniqueId() + "'", false);
+                                            // On recharge le rang
+                                            Player concernedPlayer = Bukkit.getPlayerExact(args[1]);
+                                            if(concernedPlayer != null)
+                                            {
+                                                Rank.loadRank(Bukkit.getPlayer(args[1]));
+                                            }
                                             player.sendMessage(args[2] + " Gloire ont été ajoutés à " + args[1]);
                                         } else if (args[0].equalsIgnoreCase("remove")) {
                                             nouveauGloire = Integer.parseInt(result.get(0)) - Integer.parseInt(args[2]);
-                                            bdd.executeQuery("UPDATE `statistiques` SET `gloire`='" + String.valueOf(nouveauGloire) + "' WHERE `uuid` = '" + Bukkit.getOfflinePlayer(args[1]).getUniqueId() + "'");
+                                            bdd.query("UPDATE `statistiques` SET `gloire`='" + String.valueOf(nouveauGloire) + "' WHERE `uuid` = '" + Bukkit.getOfflinePlayer(args[1]).getUniqueId() + "'", false);
+                                            // On recharge le rang
+                                            Player concernedPlayer = Bukkit.getPlayerExact(args[1]);
+                                            if(concernedPlayer != null)
+                                            {
+                                                Rank.loadRank(Bukkit.getPlayer(args[1]));
+                                            }
                                             player.sendMessage(args[2] + " Gloire ont été enlevés à " + args[1]);
                                         }
                                     } else {
@@ -86,9 +113,60 @@ public class CommandGloire implements CommandExecutor {
                             }
                         });
                     } else {
-                        player.sendMessage("Erreur de syntaxe: /gloire add <joueur> <montant>");
+                        player.sendMessage("Erreur de syntaxe: /gloire add/remove <joueur> <montant>");
                     }
                 }
+            }
+            // /GLOIRE TIMER
+            else if (args[0].equalsIgnoreCase("setday")) {
+
+                if (args.length <= 1 || args.length >= 3) {
+                    player.sendMessage("Erreur de syntaxe: /gloire setday <00-31>");
+                }
+                else
+                {
+                    // On set le jour du mois pour le timer
+                    if (args[1].matches("0[1-9]|[12]\\d|3[01]")) {
+                        Date today = Calendar.getInstance().getTime();
+                        Calendar c = Calendar.getInstance();
+                        c.setTime(today);
+                        c.set(Calendar.DAY_OF_MONTH, Integer.parseInt(args[1]));
+                        c.set(Calendar.HOUR_OF_DAY, 0);
+                        c.set(Calendar.HOUR_OF_DAY, 0);
+                        c.set(Calendar.MINUTE, 0);
+                        c.set(Calendar.SECOND, 0);
+                        c.set(Calendar.MILLISECOND, 0);
+                        Calendar cal = Calendar.getInstance();
+                        int dayNumber = cal.get(Calendar.DAY_OF_MONTH);
+                        if (dayNumber < Integer.parseInt(args[1])) {
+                            c.add(Calendar.MONTH, -1);
+                        }
+
+                        Date newDate = c.getTime();
+                        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                        try {
+                            Database bdd = new Database(plugin.getConfig().getString("database.host"),
+                                    Integer.parseInt(plugin.getConfig().getString("database.port")),
+                                    plugin.getConfig().getString("database.database"),
+                                    plugin.getConfig().getString("database.username"),
+                                    plugin.getConfig().getString("database.password"));
+
+                            bdd.query("UPDATE `config` SET `lastReset`='" + dateFormat.format(newDate) + "' WHERE 1", false);
+                            c.add(Calendar.MONTH, 1);
+                            newDate = c.getTime();
+                            player.sendMessage("Prochain reset : " + dateFormat.format(newDate));
+                        } catch (SQLException throwables) {
+                            throwables.printStackTrace();
+                        }
+                    }
+                    else
+                    {
+                        player.sendMessage("Erreur de syntaxe: /gloire setday <01-31>");
+                    }
+                }
+            }
+            else {
+                player.sendMessage("Commande introuvable");
             }
         }
         else {

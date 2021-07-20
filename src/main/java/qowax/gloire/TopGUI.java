@@ -9,6 +9,7 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
+import org.bukkit.plugin.Plugin;
 
 import java.math.BigInteger;
 import java.sql.SQLException;
@@ -19,11 +20,12 @@ import java.util.UUID;
 
 public class TopGUI implements Listener {
 
+    private Plugin plugin;
     private final Inventory inv;
-    private Database bdd;
 
-    public TopGUI(Database _bdd) {
-        bdd = _bdd;
+    public TopGUI(Plugin _plugin) {
+        plugin = _plugin;
+
         // Crée l'inventaire
         inv = Bukkit.createInventory(null, 45, "TOP - Gloire");
 
@@ -37,7 +39,12 @@ public class TopGUI implements Listener {
 
     // Initialise les items di GUI
     public void initializeItems() throws SQLException {
-        ArrayList<String> result = bdd.sendRequest("SELECT `uuid`, `gloire` FROM `statistiques` ORDER BY `gloire` DESC LIMIT 25;");
+        Database bdd = new Database(plugin.getConfig().getString("database.host"),
+                Integer.parseInt(plugin.getConfig().getString("database.port")),
+                plugin.getConfig().getString("database.database"),
+                plugin.getConfig().getString("database.username"),
+                plugin.getConfig().getString("database.password"));
+        ArrayList<String> result = bdd.query("SELECT `uuid`, `gloire` FROM `statistiques` ORDER BY `gloire` DESC LIMIT 25;", true);
 
         // Ajout item boussole compte à rebours
         ItemStack timer = new ItemStack(Material.COMPASS, 1);
@@ -70,7 +77,10 @@ public class TopGUI implements Listener {
             Bukkit.getLogger().info(Bukkit.getOfflinePlayer(playerUUID).getName());
             meta.setDisplayName(Bukkit.getOfflinePlayer(playerUUID).getName());
             List<String> description = new ArrayList<>();
-            description.add(0, result.get(i+1));
+
+            // On recrée le rang du joueur
+            description.add(0, ChatColor.translateAlternateColorCodes('&', Rank.getOfflinePlayerPrefix(Bukkit.getOfflinePlayer(playerUUID))));
+            description.add(1, ChatColor.GREEN + result.get(i+1));
             meta.setLore(description);
             skull.setItemMeta(meta);
 
@@ -152,7 +162,7 @@ public class TopGUI implements Listener {
                 case 48:
                     inv.setItem(44,skull);
                     break;
-            }
+                }
         }
     }
 

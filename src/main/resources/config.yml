@@ -6,12 +6,14 @@ database:
   username: minecraft
   password: minecraft
 
+# Configuration timer
+timer:
+  schedule_check: 50 # Nombre de ticks à chaque check du timer (1200 = 1 minute)
+
 # Plugin configuration
 config:
   gloire_base: 100 # Nombre de Gloire qu'un nouveau joueur obtient
-
   gloire_player: 3 # Nombre de Gloire obtenus en tuant un autre joueur
-
   gloire_creeper: 3 # Nombre de Gloire obtenus en tuant un Creeper
   gloire_bat: 3
   gloire_blaze: 3
@@ -56,6 +58,24 @@ config:
   gloire_zombie: 3
   gloire_zombie_horse: 3
   gloire_zombie_villager: 3
+  broadcast_reset: '&d[Gloire] Reset des points de Gloire&f'
 
-
-
+# Configuration des niveaux
+levels:
+  podium:
+    value: 100000
+    prefix: '&b[PODIUM]&f'
+  grand:
+    value: 50000
+    prefix: '&6[GRAND]&f'
+  impitoyable:
+    value: 25000
+    prefix: '&5[IMPITOYABLE]&f'
+  triomphant:
+    value: 10000
+    prefix: '&1[TRIOMPHANT]&f'
+  temeraire:
+    value: 5000
+    prefix: '&2[TEMERAIRE]&f'
+  aucun:
+    prefix: ''

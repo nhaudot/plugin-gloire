@@ -16,10 +16,10 @@ public class Database {
     public String password;
 
     MysqlDataSource dataSource;
-    public boolean status; // Status de la connexion
     private DataSource dataSrc;
 
-    public Database(String _host, int _port, String _ddb, String _username, String _password) {
+    // Essai connexion
+    public Database(String _host, int _port, String _ddb, String _username, String _password) throws SQLException {
         host = _host; port = _port; ddb = _ddb; username = _username; password = _password;
 
         dataSource = new MysqlConnectionPoolDataSource();
@@ -28,51 +28,50 @@ public class Database {
         dataSource.setDatabaseName(ddb);
         dataSource.setUser(username);
         dataSource.setPassword(password);
-    }
 
-    // Initialise la connexion à la base de données
-    public void connect() throws SQLException
-    {
         try (Connection conn = dataSource.getConnection()) {
             if (!conn.isValid(1000)) {
                 throw new SQLException("[Gloire] Connexion MySQL non-réussie, veuillez vérifier la configuration");
             }
         }
+
         dataSrc = dataSource;
     }
 
-    public ArrayList sendRequest(String _request) throws SQLException
-    {
-        ResultSet rs = null;
-        ArrayList<String> sqlArray = null;
+    // Requête avec/sans réponse (boolean _data)
+    public ArrayList query(String _query, boolean _data) {
+        // Si l'on exige un retour de données
+        if (_data == true) {
+            ResultSet rs = null;
+            ArrayList<String> sqlArray = null;
 
-        try (Connection conn = dataSrc.getConnection(); PreparedStatement stmt = conn.prepareStatement(_request)) {
-            rs = stmt.executeQuery();
+            try (Connection conn = dataSrc.getConnection(); PreparedStatement stmt = conn.prepareStatement(_query)) {
+                rs = stmt.executeQuery();
+                ResultSetMetaData rsmd = rs.getMetaData();
+                int columnCount = rsmd.getColumnCount();
+                sqlArray = new ArrayList<>(columnCount);
 
-
-            ResultSetMetaData rsmd = rs.getMetaData();
-            int columnCount = rsmd.getColumnCount();
-
-            sqlArray = new ArrayList<>(columnCount);
-            while (rs.next()) {
-                int i = 1;
-                while (i <= columnCount) {
-                    sqlArray.add(rs.getString(i++));
+                while (rs.next()) {
+                    int i = 1;
+                    while (i <= columnCount) {
+                        sqlArray.add(rs.getString(i++));
+                    }
                 }
+            } catch (SQLException e) {
+                e.printStackTrace();
             }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
 
-        return sqlArray;
-    }
+            return sqlArray;
+        // Si l'on exige pas de retour de données
+        } else {
+            try (Connection conn = dataSrc.getConnection(); PreparedStatement stmt = conn.prepareStatement(_query)) {
+                int rs = stmt.executeUpdate();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+            ArrayList<String> empty = null;
 
-    public void executeQuery(String _query) throws SQLException {
-        try (Connection conn = dataSrc.getConnection(); PreparedStatement stmt = conn.prepareStatement(_query)) {
-            int rs = stmt.executeUpdate();
-        } catch (SQLException e) {
-            e.printStackTrace();
+            return empty;
         }
     }
 }
-
