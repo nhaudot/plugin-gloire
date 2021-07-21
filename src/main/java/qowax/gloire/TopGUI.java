@@ -165,20 +165,6 @@ public class TopGUI implements Listener {
         }
     }
 
-    // Créer un item custom
-    protected ItemStack createGuiItem(final Material material, final String name, final String... lore) {
-        final ItemStack item = new ItemStack(material, 1);
-        final ItemMeta meta = item.getItemMeta();
-
-        // Nom de l'item
-        meta.setDisplayName(name);
-        // "Lore" de l'item
-        meta.setLore(Arrays.asList(lore));
-        item.setItemMeta(meta);
-
-        return item;
-    }
-
     // Ouvrir le GUI
     public void openInventory(final HumanEntity ent) {
         ent.openInventory(inv);

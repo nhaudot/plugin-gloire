@@ -32,11 +32,6 @@ public enum Rank {
         this.prefix = prefix;
     }
 
-    // Avoir le rang
-    public static Rank getRank(Player player) {
-        return ranks.get(player);
-    }
-
     // Avoir le préfix
     public static String getPrefix(Player player) {
         return ranks.get(player).prefix;

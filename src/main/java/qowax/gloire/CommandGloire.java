@@ -36,21 +36,18 @@ public class CommandGloire implements CommandExecutor {
             // /GLOIRE
             if (args.length == 0)
             {
-                Bukkit.getScheduler().runTaskAsynchronously(plugin, new Runnable() {
-                    @Override
-                    public void run() {
-                        try {
-                            Database bdd = new Database(plugin.getConfig().getString("database.host"),
-                                    Integer.parseInt(plugin.getConfig().getString("database.port")),
-                                    plugin.getConfig().getString("database.database"),
-                                    plugin.getConfig().getString("database.username"),
-                                    plugin.getConfig().getString("database.password"));
+                Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+                    try {
+                        Database bdd = new Database(plugin.getConfig().getString("database.host"),
+                                Integer.parseInt(plugin.getConfig().getString("database.port")),
+                                plugin.getConfig().getString("database.database"),
+                                plugin.getConfig().getString("database.username"),
+                                plugin.getConfig().getString("database.password"));
 
-                            ArrayList<String> result = bdd.query("SELECT `gloire` FROM `statistiques` WHERE `uuid` = '" + player.getUniqueId() + "'", true);
-                            sender.sendMessage("Vous avez " + result.get(0) + " gloires");
-                        } catch (SQLException throwables) {
-                            throwables.printStackTrace();
-                        }
+                        ArrayList<String> result = bdd.query("SELECT `gloire` FROM `statistiques` WHERE `uuid` = '" + player.getUniqueId() + "'", true);
+                        sender.sendMessage(ChatColor.translateAlternateColorCodes('&', plugin.getConfig().getString("config.gloire").replace("%s", result.get(0))));
+                    } catch (SQLException throwables) {
+                        throwables.printStackTrace();
                     }
                 });
             }
@@ -65,55 +62,52 @@ public class CommandGloire implements CommandExecutor {
             else if (args[0].equalsIgnoreCase("add") || args[0].equalsIgnoreCase("remove")) {
 
                 if (args.length <= 2 || args.length >= 4) {
-                    player.sendMessage("Erreur de syntaxe: /gloire add/remove <joueur> <montant>");
+                    player.sendMessage("Erreur de syntaxe: /gloire <add|remove> <joueur> <montant>");
                 }
                 else
                 {
                     if (args[2].matches("[0-9]+")) {
                         // Recherche joueur dans bdd
-                        Bukkit.getScheduler().runTaskAsynchronously(plugin, new Runnable() {
-                            @Override
-                            public void run() {
-                                try {
-                                    Database bdd = new Database(plugin.getConfig().getString("database.host"),
-                                            Integer.parseInt(plugin.getConfig().getString("database.port")),
-                                            plugin.getConfig().getString("database.database"),
-                                            plugin.getConfig().getString("database.username"),
-                                            plugin.getConfig().getString("database.password"));
-                                    ArrayList<String> result = bdd.query("SELECT `gloire` FROM `statistiques` WHERE `uuid` = '" + Bukkit.getOfflinePlayer(args[1]).getUniqueId() + "'", true);
-                                    if (result.size() != 0) {
-                                        int nouveauGloire = 0;
-                                        if (args[0].equalsIgnoreCase("add")) {
-                                            nouveauGloire = Integer.parseInt(result.get(0)) + Integer.parseInt(args[2]);
-                                            bdd.query("UPDATE `statistiques` SET `gloire`='" + String.valueOf(nouveauGloire) + "' WHERE `uuid` = '" + Bukkit.getOfflinePlayer(args[1]).getUniqueId() + "'", false);
-                                            // On recharge le rang
-                                            Player concernedPlayer = Bukkit.getPlayerExact(args[1]);
-                                            if(concernedPlayer != null)
-                                            {
-                                                Rank.loadRank(Bukkit.getPlayer(args[1]));
-                                            }
-                                            player.sendMessage(args[2] + " Gloire ont été ajoutés à " + args[1]);
-                                        } else if (args[0].equalsIgnoreCase("remove")) {
-                                            nouveauGloire = Integer.parseInt(result.get(0)) - Integer.parseInt(args[2]);
-                                            bdd.query("UPDATE `statistiques` SET `gloire`='" + String.valueOf(nouveauGloire) + "' WHERE `uuid` = '" + Bukkit.getOfflinePlayer(args[1]).getUniqueId() + "'", false);
-                                            // On recharge le rang
-                                            Player concernedPlayer = Bukkit.getPlayerExact(args[1]);
-                                            if(concernedPlayer != null)
-                                            {
-                                                Rank.loadRank(Bukkit.getPlayer(args[1]));
-                                            }
-                                            player.sendMessage(args[2] + " Gloire ont été enlevés à " + args[1]);
+                        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+                            try {
+                                Database bdd = new Database(plugin.getConfig().getString("database.host"),
+                                        Integer.parseInt(plugin.getConfig().getString("database.port")),
+                                        plugin.getConfig().getString("database.database"),
+                                        plugin.getConfig().getString("database.username"),
+                                        plugin.getConfig().getString("database.password"));
+                                ArrayList<String> result = bdd.query("SELECT `gloire` FROM `statistiques` WHERE `uuid` = '" + Bukkit.getOfflinePlayer(args[1]).getUniqueId() + "'", true);
+                                if (result.size() != 0) {
+                                    int nouveauGloire;
+                                    if (args[0].equalsIgnoreCase("add")) {
+                                        nouveauGloire = Integer.parseInt(result.get(0)) + Integer.parseInt(args[2]);
+                                        bdd.query("UPDATE `statistiques` SET `gloire`='" + String.valueOf(nouveauGloire) + "' WHERE `uuid` = '" + Bukkit.getOfflinePlayer(args[1]).getUniqueId() + "'", false);
+                                        // On recharge le rang
+                                        Player concernedPlayer = Bukkit.getPlayerExact(args[1]);
+                                        if(concernedPlayer != null)
+                                        {
+                                            Rank.loadRank(Bukkit.getPlayer(args[1]));
                                         }
-                                    } else {
-                                        player.sendMessage("Impossible de trouver le joueur");
+                                        player.sendMessage(args[2] + " Gloire ont été ajoutés à " + args[1]);
+                                    } else if (args[0].equalsIgnoreCase("remove")) {
+                                        nouveauGloire = Integer.parseInt(result.get(0)) - Integer.parseInt(args[2]);
+                                        bdd.query("UPDATE `statistiques` SET `gloire`='" + String.valueOf(nouveauGloire) + "' WHERE `uuid` = '" + Bukkit.getOfflinePlayer(args[1]).getUniqueId() + "'", false);
+                                        // On recharge le rang
+                                        Player concernedPlayer = Bukkit.getPlayerExact(args[1]);
+                                        if(concernedPlayer != null)
+                                        {
+                                            Rank.loadRank(Bukkit.getPlayer(args[1]));
+                                        }
+                                        player.sendMessage(args[2] + " Gloire ont été enlevés à " + args[1]);
                                     }
-                                } catch (SQLException throwables) {
-                                    throwables.printStackTrace();
+                                } else {
+                                    player.sendMessage("Impossible de trouver le joueur");
                                 }
+                            } catch (SQLException throwables) {
+                                throwables.printStackTrace();
                             }
                         });
                     } else {
-                        player.sendMessage("Erreur de syntaxe: /gloire add/remove <joueur> <montant>");
+                        player.sendMessage("Erreur de syntaxe: /gloire <add|remove> <joueur> <montant>");
                     }
                 }
             }
@@ -164,6 +158,13 @@ public class CommandGloire implements CommandExecutor {
                         player.sendMessage("Erreur de syntaxe: /gloire setday <01-31>");
                     }
                 }
+            }
+            else if (args[0].equalsIgnoreCase("help")) {
+                player.sendMessage(ChatColor.translateAlternateColorCodes('&', "&e### AIDE PLUGIN GLOIRE ###"));
+                player.sendMessage(ChatColor.translateAlternateColorCodes('&', "&6/gloire&f: Affiche le nombre de Gloire du joueur"));
+                player.sendMessage(ChatColor.translateAlternateColorCodes('&', "&6/gloire top&f: Affiche le top joueurs du serveur"));
+                player.sendMessage(ChatColor.translateAlternateColorCodes('&', "&6/gloire <add|remove> <joueur> <montant>&f: Ajoute ou enlève des Gloire à un joueur"));
+                player.sendMessage(ChatColor.translateAlternateColorCodes('&', "&6/gloire setday <00-31>&f: Définit le jour du mois auquel le nombre de Gloire sera remis à zéro"));
             }
             else {
                 player.sendMessage("Commande introuvable");

@@ -1,6 +1,7 @@
 package qowax.gloire.Listeners;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -18,11 +19,8 @@ import qowax.gloire.Rank;
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 
 public class EventListener implements Listener {
 
@@ -38,9 +36,8 @@ public class EventListener implements Listener {
                 // Si le joueur appuie sur le livre ou la boussole
                 if (is.getType() == Material.COMPASS) {
                     // On calcule le temps restant avant le reset
+                    Database bdd;
 
-
-                    Database bdd = null;
                     try {
                         bdd = new Database(Gloire.plugin.getConfig().getString("database.host"),
                                 Integer.parseInt(Gloire.plugin.getConfig().getString("database.port")),
@@ -64,14 +61,14 @@ public class EventListener implements Listener {
                         long diffSeconds = diff / 1000;
 
                         // Envoie le temps restant au joueur
-                        e.getWhoClicked().sendMessage("Temps restant : " + diffDay + " jours, " + String.format("%02d", diffHours) + "h" + String.format("%02d", diffMinutes) + "m" + String.format("%02d", diffSeconds) + "s");
+                        e.getWhoClicked().sendMessage(ChatColor.translateAlternateColorCodes('&', Gloire.plugin.getConfig().getString("config.timer")) + diffDay + " jours, " + String.format("%02d", diffHours) + "h" + String.format("%02d", diffMinutes) + "m" + String.format("%02d", diffSeconds) + "s");
                     } catch (SQLException | ParseException throwables) {
                         throwables.printStackTrace();
                     }
                     p.closeInventory();
                     e.setCancelled(true);
                 } else if (is.getType() == Material.BOOK_AND_QUILL) {
-                    e.getWhoClicked().sendMessage("Pour gagner des points de Gloire, tues des mobs ou combats d'autres joueurs. Le nombre de Gloire que tu gagneras dépend de la difficulté de tes combats.");
+                    e.getWhoClicked().sendMessage(ChatColor.translateAlternateColorCodes('&', Gloire.plugin.getConfig().getString("config.gagner_gloires")));
                     p.closeInventory();
                     e.setCancelled(true);
                 } else  {
@@ -90,30 +87,26 @@ public class EventListener implements Listener {
     public void onPlayerJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
 
-        Bukkit.getScheduler().runTaskAsynchronously(Gloire.plugin, new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    Database bdd = new Database(
-                            Gloire.plugin.getConfig().getString("database.host"),
-                            Integer.parseInt(Gloire.plugin.getConfig().getString("database.port")),
-                            Gloire.plugin.getConfig().getString("database.database"),
-                            Gloire.plugin.getConfig().getString("database.username"),
-                            Gloire.plugin.getConfig().getString("database.password"));
-                    ArrayList<String> result = bdd.query("SELECT `gloire` FROM `statistiques` WHERE `uuid` = '" + event.getPlayer().getUniqueId() + "'", true);
+        Bukkit.getScheduler().runTaskAsynchronously(Gloire.plugin, () -> {
+            try {
+                Database bdd = new Database(
+                        Gloire.plugin.getConfig().getString("database.host"),
+                        Integer.parseInt(Gloire.plugin.getConfig().getString("database.port")),
+                        Gloire.plugin.getConfig().getString("database.database"),
+                        Gloire.plugin.getConfig().getString("database.username"),
+                        Gloire.plugin.getConfig().getString("database.password"));
+                ArrayList<String> result = bdd.query("SELECT `gloire` FROM `statistiques` WHERE `uuid` = '" + event.getPlayer().getUniqueId() + "'", true);
 
-                    // Si joueur pas présent dans la BDD
-                    if (result.size() == 0) {
-                        bdd.query("INSERT INTO `statistiques`(`uuid`, `joueur`, `gloire`) VALUES ('" + event.getPlayer().getUniqueId().toString() + "','" + event.getPlayer().getName() + "','" + Gloire.plugin.getConfig().getString("config.gloire_base") + "')", false);
-                        result = bdd.query("SELECT `gloire` FROM `statistiques` WHERE `uuid` = '" + event.getPlayer().getUniqueId() + "'", true);
+                // Si joueur pas présent dans la BDD
+                if (result.size() == 0) {
+                    bdd.query("INSERT INTO `statistiques`(`uuid`, `joueur`, `gloire`, `kills`, `morts`) VALUES ('" + event.getPlayer().getUniqueId().toString() + "','" + event.getPlayer().getName() + "','" + Gloire.plugin.getConfig().getString("config.gloire_base") + "', '0', '0')", false);
                     }
 
-                    Rank.loadRank(player);
-                } catch (SQLException throwables) {
-                    Bukkit.getServer().getLogger().warning("Erreur MySQL : " + throwables.getMessage());
-                    Bukkit.getServer().getLogger().warning ("Impossible de se connecter à la base de données, veuillez vérifier les informations dans le fichier config.yml");
-                    Bukkit.getPluginManager().disablePlugin(Gloire.plugin);
-                }
+                Rank.loadRank(player);
+            } catch (SQLException throwables) {
+                Bukkit.getServer().getLogger().warning("Erreur MySQL : " + throwables.getMessage());
+                Bukkit.getServer().getLogger().warning ("Impossible de se connecter à la base de données, veuillez vérifier les informations dans le fichier config.yml");
+                Bukkit.getPluginManager().disablePlugin(Gloire.plugin);
             }
         });
     }

@@ -13,7 +13,9 @@ timer:
 # Plugin configuration
 config:
   gloire_base: 100 # Nombre de Gloire qu'un nouveau joueur obtient
-  gloire_player: 3 # Nombre de Gloire obtenus en tuant un autre joueur
+  gloire_joueur: 1000 # Nombre de Gloire qu'un joueur obtient en tuant un autre joueur
+  gloire_joueur_perdant: 850 # Nombre de Gloire qu'un joueur perd en se faisant tuer par un autre joueur
+  # Mobs
   gloire_creeper: 3 # Nombre de Gloire obtenus en tuant un Creeper
   gloire_bat: 3
   gloire_blaze: 3
@@ -58,7 +60,14 @@ config:
   gloire_zombie: 3
   gloire_zombie_horse: 3
   gloire_zombie_villager: 3
+  # Messages
+  gagner_gloires: '&dPour gagner des points de Gloire, tues des mobs ou combats d''autres joueurs. Le nombre de Gloire que tu gagneras dépend de la difficulté de tes combats.'
   broadcast_reset: '&d[Gloire] Reset des points de Gloire&f'
+  timer: '&d[Gloire] Temps restant : '
+  gagner_points: '&d[Gloire] Vous avez gagné %s points de gloire'
+  gloire: '&d[Gloire] Vous avez %s points de gloire'
+  gloire_gagnant: '&d[Gloire] Vous avez gagné %s points de Gloire (%t% du gain total)'
+  gloire_perdant: '&d[Gloire] Vous avez perdu %s points de Gloire'
 
 # Configuration des niveaux
 levels:

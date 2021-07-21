@@ -42,7 +42,7 @@ public class Database {
     public ArrayList query(String _query, boolean _data) {
         // Si l'on exige un retour de données
         if (_data == true) {
-            ResultSet rs = null;
+            ResultSet rs;
             ArrayList<String> sqlArray = null;
 
             try (Connection conn = dataSrc.getConnection(); PreparedStatement stmt = conn.prepareStatement(_query)) {
@@ -65,7 +65,7 @@ public class Database {
         // Si l'on exige pas de retour de données
         } else {
             try (Connection conn = dataSrc.getConnection(); PreparedStatement stmt = conn.prepareStatement(_query)) {
-                int rs = stmt.executeUpdate();
+                stmt.executeUpdate();
             } catch (SQLException e) {
                 e.printStackTrace();
             }

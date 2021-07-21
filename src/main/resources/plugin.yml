@@ -7,6 +7,6 @@ website: nathan.haudot@outlook.fr
 
 commands:
   gloire:
-    description: Savoir combien de gloire le joueur possède
+    description: Commande de base du plugin. Faites /gloire help pour plus d'informations
     usage: /<command>
     permission: gloire.gloire

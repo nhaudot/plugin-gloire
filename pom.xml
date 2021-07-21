@@ -6,7 +6,7 @@
 
     <groupId>fr.qowax</groupId>
     <artifactId>gloire</artifactId>
-    <version>1.0.188</version>
+    <version>1.0.268</version>
     <packaging>jar</packaging>
 
     <name>Gloire</name>
