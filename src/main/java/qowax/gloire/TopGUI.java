@@ -3,6 +3,7 @@ package qowax.gloire;
 import org.bukkit.*;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.HumanEntity;
+import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemFlag;
@@ -14,7 +15,6 @@ import org.bukkit.plugin.Plugin;
 import java.math.BigInteger;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
@@ -23,7 +23,7 @@ public class TopGUI implements Listener {
     private Plugin plugin;
     private final Inventory inv;
 
-    public TopGUI(Plugin _plugin) {
+    public TopGUI(Plugin _plugin, Player _player) {
         plugin = _plugin;
 
         // Crée l'inventaire
@@ -31,14 +31,14 @@ public class TopGUI implements Listener {
 
         // Ajoute les têtes du top dans le GUI
         try {
-            initializeItems();
+            initializeItems(_player);
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         }
     }
 
     // Initialise les items di GUI
-    public void initializeItems() throws SQLException {
+    public void initializeItems(Player _player) throws SQLException {
         Database bdd = new Database(plugin.getConfig().getString("database.host"),
                 Integer.parseInt(plugin.getConfig().getString("database.port")),
                 plugin.getConfig().getString("database.database"),
@@ -80,6 +80,14 @@ public class TopGUI implements Listener {
             // On recrée le rang du joueur
             description.add(0, ChatColor.translateAlternateColorCodes('&', Rank.getOfflinePlayerPrefix(Bukkit.getOfflinePlayer(playerUUID))));
             description.add(1, ChatColor.GREEN + result.get(i+1));
+
+            // Ratio morts/kills si admin
+            if(_player.hasPermission("gloire.ratio")) {
+                ArrayList<String> ratioJoueur = bdd.query("SELECT `kills`, `morts` FROM `statistiques` WHERE `uuid` = '" + playerUUID.toString() + "'", true);
+                Double ratio = Double.valueOf(ratioJoueur.get(0)) / Double.valueOf(ratioJoueur.get(1));
+                description.add(2, ChatColor.RED + "Ratio K/M: " + String.format("%.2f", ratio));
+            }
+
             meta.setLore(description);
             skull.setItemMeta(meta);
 

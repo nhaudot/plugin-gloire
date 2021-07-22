@@ -9,4 +9,30 @@ commands:
   gloire:
     description: Commande de base du plugin. Faites /gloire help pour plus d'informations
     usage: /<command>
-    permission: gloire.gloire
+    permission: gloire.use
+
+permissions:
+  gloire.*:
+    description: Donne l'accès à toutes les commandes du plugin
+    children:
+      gloire.use: true
+      gloire.top: true
+      gloire.ratio: true
+      gloire.config: true
+    default: op
+
+  gloire.use:
+    description: Donne l'accès à la commande /gloire
+    default: false
+
+  gloire.top:
+    description: Donne l'accès à la commande /gloire top
+    default: false
+
+  gloire.ratio:
+    description: Affiche le ratio des joueurs dans /gloire top
+    default: false
+
+  gloire.config:
+    description: Donne l'accès aux commandes /gloire setday|add|remove
+    default: false

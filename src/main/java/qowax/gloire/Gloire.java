@@ -20,7 +20,7 @@ public final class Gloire extends JavaPlugin {
 
     public static final String BUILD_MAJ = "1";
     public static final String BUILD_MIN = "0";
-    public static final String BUILD_NUMBER = "290";
+    public static final String BUILD_NUMBER = "298";
 
     public static Plugin plugin;
 

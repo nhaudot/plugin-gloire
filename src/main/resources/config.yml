@@ -69,6 +69,7 @@ config:
   gloire_gagnant: '&d[Gloire] Vous avez gagné %s points de Gloire (%t% du gain total)'
   gloire_perdant: '&d[Gloire] Vous avez perdu %s points de Gloire'
   gloire_24h: '&d[Gloire] Vous avez déjà tué ce joueur dans les dernières 24 heures'
+  permission: '&cVous n''avez pas la permission' # Si un joueur n'a pas la permission d'utiliser une commande
 
 # Configuration des niveaux
 levels:
