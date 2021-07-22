@@ -6,7 +6,7 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import qowax.gloire.Listeners.EventListener;
-import qowax.gloire.Listeners.MobsListener;
+import qowax.gloire.Listeners.KillsListener;
 
 import java.sql.SQLException;
 import java.text.DateFormat;
@@ -20,7 +20,7 @@ public final class Gloire extends JavaPlugin {
 
     public static final String BUILD_MAJ = "1";
     public static final String BUILD_MIN = "0";
-    public static final String BUILD_NUMBER = "268";
+    public static final String BUILD_NUMBER = "290";
 
     public static Plugin plugin;
 
@@ -63,11 +63,12 @@ public final class Gloire extends JavaPlugin {
                     bdd.query("CREATE TABLE `config` (`lastReset` datetime NOT NULL) DEFAULT CHARSET=utf8;", false);
                     bdd.query("INSERT INTO `config` (`lastReset`) VALUES ('2021-07-01 00:00:00');", false);
                     bdd.query("CREATE TABLE `fightTable` (`ennemy` text NOT NULL, `damagedPlayer` text NOT NULL, `hearts` decimal(4,1) NOT NULL) DEFAULT CHARSET=utf8;", false);
+                    bdd.query("CREATE TABLE `killTable` (`killer` text NOT NULL, `killedPlayer` text NOT NULL, `lastKillDate` datetime NOT NULL) DEFAULT CHARSET=utf8;", false);
                     getLogger().info("Base de données ok!");
                 }
 
                 // Initialise la connexion pour MobsListener
-                MobsListener.bddFightTable = new Database(getConfig().getString("database.host"),
+                KillsListener.bddFightTable = new Database(getConfig().getString("database.host"),
                         Integer.parseInt(getConfig().getString("database.port")),
                         getConfig().getString("database.database"),
                         getConfig().getString("database.username"),
@@ -84,7 +85,7 @@ public final class Gloire extends JavaPlugin {
 
         // Listeners
         getServer().getPluginManager().registerEvents(new EventListener(), plugin);
-        getServer().getPluginManager().registerEvents(new MobsListener(), plugin);
+        getServer().getPluginManager().registerEvents(new KillsListener(), plugin);
 
         // Lancement Timer
         timerLaunch();

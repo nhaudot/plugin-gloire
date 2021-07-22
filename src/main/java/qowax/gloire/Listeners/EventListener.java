@@ -114,7 +114,7 @@ public class EventListener implements Listener {
     // Quand un joueur parle dans le chat
     @EventHandler
     public void onPlayerChat(AsyncPlayerChatEvent e) {
-        e.setFormat(" " + Rank.getPrefix(e.getPlayer()) + " " + e.getPlayer().getDisplayName() +  " : " + e.getMessage());
+        e.setFormat(e.getFormat().replace("{gloire_rang}", Rank.getPrefix(e.getPlayer())));
     }
 
     // Quand un joueur quitte le serveur
