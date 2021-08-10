@@ -71,6 +71,26 @@ config:
   gloire_24h: '&d[Gloire] Vous avez déjà tué ce joueur dans les dernières 24 heures'
   permission: '&cVous n''avez pas la permission' # Si un joueur n'a pas la permission d'utiliser une commande
 
+  # Récompenses
+  fin_saison_award: '&d[Gloire] C''est la fin de saison! En tant que %s&d, vous avez gagné des lots!'
+  recompense_kit: 'Guerrier'
+  recompense_glorium: 'GLORE_LINGOT_GLORIUM'
+  recompense_boost_journalier: '&d[Gloire] Tes récompenses journalières ont été boostées'
+  recompense_familier: '&d[Gloire] Tu as gagné un familier ?'
+  recompense_roulette: '&d[Gloire] Tu as une roulette ?'
+  recompense_boss: '&d[Gloire] Tu as accès à la zone des boss !'
+  recompense_seed: '&d[Gloire] Seed ?'
+  recompense_quetes_bonus: '&d[Gloire] Tu as accès à des quêtes bonus !'
+  recompense_cesium: 'GLORE_LINGOT_GLORIUM'
+  recompense_100_boutique: '&d[Gloire] Vous avez gagné 100% de la boutique in-game !'
+  recompense_particules: '&d[Gloire] Vous avez désormais l’effet « Particules » !'
+  recompense_discord: '&d[Gloire] Vous avez désormais des avantages sur Discord !'
+  recompense_baton_sorcier: '&d[Gloire] Vous avez gagné un baton de sorcier !'
+  recompense_points_boutique:  '&d[Gloire] Vous avez gagné des points sur la boutique en ligne !'
+  recompense_arthemite: 'AIR'
+  recompense_livre_lightning:  '&d[Gloire] Vous avez gagné un livre de Lightning !'
+  recompense_saison_pass: '&d[Gloire] Vous avez gagné 1 mois de saison pass !'
+
 # Configuration des niveaux
 levels:
   transcendant:

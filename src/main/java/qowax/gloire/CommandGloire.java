@@ -66,13 +66,13 @@ public class CommandGloire implements CommandExecutor {
                     monGui.openInventory((HumanEntity) sender);
                 }
             }
-            // /GLOIRE ADD/REMOVE <joueur> <montant>
-            else if (args[0].equalsIgnoreCase("add") || args[0].equalsIgnoreCase("remove")) {
+            // /GLOIRE ADD/REMOVE/SET <joueur> <montant>
+            else if (args[0].equalsIgnoreCase("add") || args[0].equalsIgnoreCase("remove") || args[0].equalsIgnoreCase("set")) {
                 if(!player.hasPermission("gloire.config")) {
                     player.sendMessage(ChatColor.translateAlternateColorCodes('&', plugin.getConfig().getString("config.permission")));
                 } else {
                     if (args.length <= 2 || args.length >= 4) {
-                        player.sendMessage("Erreur de syntaxe: /gloire <add|remove> <joueur> <montant>");
+                        player.sendMessage("Erreur de syntaxe: /gloire <add|remove|set> <joueur> <montant>");
                     }
                     else
                     {
@@ -108,6 +108,15 @@ public class CommandGloire implements CommandExecutor {
                                                 Rank.loadRank(Bukkit.getPlayer(args[1]));
                                             }
                                             player.sendMessage(args[2] + " Gloire ont été enlevés à " + args[1]);
+                                        } else if (args[0].equalsIgnoreCase("set")) {
+                                            bdd.query("UPDATE `statistiques` SET `gloire`='" + Integer.parseInt(args[2]) + "' WHERE `uuid` = '" + Bukkit.getOfflinePlayer(args[1]).getUniqueId() + "'", false);
+                                            // On recharge le rang
+                                            Player concernedPlayer = Bukkit.getPlayerExact(args[1]);
+                                            if(concernedPlayer != null)
+                                            {
+                                                Rank.loadRank(Bukkit.getPlayer(args[1]));
+                                            }
+                                            player.sendMessage(args[2] + " Gloire ont été attribués à " + args[1]);
                                         }
                                     } else {
                                         player.sendMessage("Impossible de trouver le joueur");
@@ -117,7 +126,7 @@ public class CommandGloire implements CommandExecutor {
                                 }
                             });
                         } else {
-                            player.sendMessage("Erreur de syntaxe: /gloire <add|remove> <joueur> <montant>");
+                            player.sendMessage("Erreur de syntaxe: /gloire <add|remove|set> <joueur> <montant>");
                         }
                     }
                 }
@@ -173,12 +182,36 @@ public class CommandGloire implements CommandExecutor {
                     }
                 }
             }
+            else if (args[0].equalsIgnoreCase("reset")) {
+                if(!player.hasPermission("gloire.config")) {
+                    player.sendMessage(ChatColor.translateAlternateColorCodes('&', plugin.getConfig().getString("config.permission")));
+                } else {
+                    if (args.length == 2) {
+                        try {
+                            Player concernedPlayer = Bukkit.getPlayerExact(args[1]);
+                            Database bdd = new Database(plugin.getConfig().getString("database.host"),
+                                    Integer.parseInt(plugin.getConfig().getString("database.port")),
+                                    plugin.getConfig().getString("database.database"),
+                                    plugin.getConfig().getString("database.username"),
+                                    plugin.getConfig().getString("database.password"));
+
+                            bdd.query("UPDATE `statistiques` SET `gloire`='" + plugin.getConfig().getString("config.gloire_base") + "' WHERE `uuid`='" + concernedPlayer.getUniqueId().toString() +"'", false);
+                            player.sendMessage("Les Gloire du joueur " + args[1] + " ont été remis à zéro.");
+                        } catch (SQLException throwables) {
+                            throwables.printStackTrace();
+                        }
+                    } else {
+                        player.sendMessage("Erreur de syntaxe: /gloire reset <joueur>");
+                    }
+                }
+            }
             else if (args[0].equalsIgnoreCase("help")) {
                 player.sendMessage(ChatColor.translateAlternateColorCodes('&', "&e### AIDE PLUGIN GLOIRE ###"));
                 player.sendMessage(ChatColor.translateAlternateColorCodes('&', "&6/gloire&f: Affiche le nombre de Gloire du joueur"));
                 player.sendMessage(ChatColor.translateAlternateColorCodes('&', "&6/gloire top&f: Affiche le top joueurs du serveur"));
                 player.sendMessage(ChatColor.translateAlternateColorCodes('&', "&6/gloire <add|remove> <joueur> <montant>&f: Ajoute ou enlève des Gloire à un joueur"));
                 player.sendMessage(ChatColor.translateAlternateColorCodes('&', "&6/gloire setday <00-31>&f: Définit le jour du mois auquel le nombre de Gloire sera remis à zéro"));
+                player.sendMessage(ChatColor.translateAlternateColorCodes('&', "&6/gloire reset <joueur>&f: Remet à zéro le nombre de Gloire d'un joueur"));
             }
             else {
                 player.sendMessage("Commande introuvable");

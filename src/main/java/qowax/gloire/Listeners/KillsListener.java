@@ -140,7 +140,6 @@ public class KillsListener implements Listener {
                     // On informe le joueur
                     entity.sendMessage(ChatColor.translateAlternateColorCodes('&', Gloire.plugin.getConfig().getString("config.gloire_perdant").replace("%s", String.valueOf(gloirePourJoueurTue))));
                 }
-
                 // On recharge le rang du joueur tué
                 Rank.loadRank((Player) entity);
             }
@@ -148,6 +147,7 @@ public class KillsListener implements Listener {
             else
             {
                 // Envoi requête SQL
+                entity.getKiller().sendMessage(event.getEntity().toString().toLowerCase().substring(5));
                 Bukkit.getScheduler().runTaskAsynchronously(Gloire.plugin, () -> {
                     try {
                         Database bdd = new Database(

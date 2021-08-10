@@ -34,5 +34,5 @@ permissions:
     default: false
 
   gloire.config:
-    description: Donne l'accès aux commandes /gloire setday|add|remove
+    description: Donne l'accès aux commandes /gloire setday|add|remove|set
     default: false

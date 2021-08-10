@@ -92,7 +92,6 @@ public class TopGUI implements Listener {
             skull.setItemMeta(meta);
 
             // Ajoute le joueur au top
-            int j = 4;
             switch (i) {
                 case 0:
                     inv.setItem(4,skull);
