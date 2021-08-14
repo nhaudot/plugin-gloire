@@ -22,7 +22,7 @@ public final class Gloire extends JavaPlugin {
 
     public static final String BUILD_MAJ = "1";
     public static final String BUILD_MIN = "0";
-    public static final String BUILD_NUMBER = "323";
+    public static final String BUILD_NUMBER = "345";
 
     public static Plugin plugin;
 
@@ -66,6 +66,7 @@ public final class Gloire extends JavaPlugin {
                     bdd.query("INSERT INTO `config` (`lastReset`) VALUES ('2021-07-01 00:00:00');", false);
                     bdd.query("CREATE TABLE `fightTable` (`ennemy` text NOT NULL, `damagedPlayer` text NOT NULL, `hearts` decimal(4,1) NOT NULL) DEFAULT CHARSET=utf8;", false);
                     bdd.query("CREATE TABLE `killTable` (`killer` text NOT NULL, `killedPlayer` text NOT NULL, `lastKillDate` datetime NOT NULL) DEFAULT CHARSET=utf8;", false);
+                    bdd.query("CREATE TABLE `offlineBonusTable` (`uuid` text NOT NULL, `gloire` int(11) NOT NULL) DEFAULT CHARSET=utf8;", false);
                     getLogger().info("Base de données ok!");
                 }
 
@@ -123,10 +124,6 @@ public final class Gloire extends JavaPlugin {
                 int resultDate = today.compareTo(lastReset);
                 // C'est l'heure de reset
                 if (resultDate >= 0) {
-                    // Reset des points de Gloire
-                    bdd.query("UPDATE `statistiques` SET `gloire`=" + plugin.getConfig().getString("config.gloire_base") + " WHERE 1", false);
-                    Bukkit.getServer().broadcastMessage(ChatColor.translateAlternateColorCodes('&', plugin.getConfig().getString("config.broadcast_reset")));
-
                     // On recrée la date
                     c.setTime(today);
                     c.set(Calendar.HOUR_OF_DAY, 0);
@@ -146,263 +143,116 @@ public final class Gloire extends JavaPlugin {
                         UUID playerUUID = new UUID(new BigInteger(s.substring(0, 16), 16).longValue(), new BigInteger(s.substring(16), 16).longValue());
                         Rank rank = Rank.getOfflinePlayerRank(Bukkit.getOfflinePlayer(playerUUID));
 
-                        // Check des récompenses
-                        try {
-                            Bukkit.getOfflinePlayer(playerUUID).getPlayer().sendMessage(ChatColor.translateAlternateColorCodes('&', Gloire.plugin.getConfig().getString("config.fin_saison_award").replace("%s", Rank.getOfflinePlayerPrefix(Bukkit.getOfflinePlayer(playerUUID)))));
-                            //Bukkit.getOfflinePlayer(playerUUID).getPlayer().sendMessage(Bukkit.getOfflinePlayer(playerUUID).getPlayer().getItemInHand().getType().toString());
-                        } catch (NullPointerException e) {
-                            // Ne rien faire
-                        }
-
-                        if (rank == Rank.PREFIX_TEMERAIRE) {
-                            // Kit hebdomadaire
-                            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "kit Guerrier " + Bukkit.getOfflinePlayer(playerUUID).getPlayer().getName());
-                        } else if (rank == Rank.PREFIX_TRIOMPHANT) {
-                            // Kit hebdomadaire
-                            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "kit Guerrier " + Bukkit.getOfflinePlayer(playerUUID).getPlayer().getName());
-
-                            // Glorium
-                            Material itemType = Material.matchMaterial("GLORE_LINGOT_GLORIUM");
-                            ItemStack itemStack = new ItemStack(itemType);
-                            Bukkit.getOfflinePlayer(playerUUID).getPlayer().getInventory().addItem(itemStack);
-
-                            // Récompense journalière boostée
-                            Bukkit.getOfflinePlayer(playerUUID).getPlayer().sendMessage(ChatColor.translateAlternateColorCodes('&', Gloire.plugin.getConfig().getString("config.recompense_boost_journalier").replace("%s", Rank.getOfflinePlayerPrefix(Bukkit.getOfflinePlayer(playerUUID)))));
-
-                            // Récompense familier
-                            Bukkit.getOfflinePlayer(playerUUID).getPlayer().sendMessage(ChatColor.translateAlternateColorCodes('&', Gloire.plugin.getConfig().getString("config.recompense_familier")));
-                        } else if (rank == Rank.PREFIX_IMPITOYABLE) {
-                            // Kit hebdomadaire
-                            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "kit Guerrier " + Bukkit.getOfflinePlayer(playerUUID).getPlayer().getName());
-
-                            // Glorium
-                            Material itemType = Material.matchMaterial("GLORE_LINGOT_GLORIUM");
-                            ItemStack itemStack = new ItemStack(itemType);
-                            Bukkit.getOfflinePlayer(playerUUID).getPlayer().getInventory().addItem(itemStack);
-
-                            // Récompense journalière boostée
-                            Bukkit.getOfflinePlayer(playerUUID).getPlayer().sendMessage(ChatColor.translateAlternateColorCodes('&', Gloire.plugin.getConfig().getString("config.recompense_boost_journalier").replace("%s", Rank.getOfflinePlayerPrefix(Bukkit.getOfflinePlayer(playerUUID)))));
-
-                            // Récompense familier
-                            Bukkit.getOfflinePlayer(playerUUID).getPlayer().sendMessage(ChatColor.translateAlternateColorCodes('&', Gloire.plugin.getConfig().getString("config.recompense_familier")));
-
-                            // Récompense roulette
-                            Bukkit.getOfflinePlayer(playerUUID).getPlayer().sendMessage(ChatColor.translateAlternateColorCodes('&', Gloire.plugin.getConfig().getString("config.recompense_roulette")));
-
-                            // Récompense zone des boss
-                            Bukkit.getOfflinePlayer(playerUUID).getPlayer().sendMessage(ChatColor.translateAlternateColorCodes('&', Gloire.plugin.getConfig().getString("config.recompense_boss")));
-                        } else if (rank == Rank.PREFIX_GRAND) {
-                            // Kit hebdomadaire
-                            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "kit Guerrier " + Bukkit.getOfflinePlayer(playerUUID).getPlayer().getName());
-
-                            // Glorium
-                            Material itemType = Material.matchMaterial("GLORE_LINGOT_GLORIUM");
-                            ItemStack itemStack = new ItemStack(itemType);
-                            Bukkit.getOfflinePlayer(playerUUID).getPlayer().getInventory().addItem(itemStack);
-
-                            // Récompense journalière boostée
-                            Bukkit.getOfflinePlayer(playerUUID).getPlayer().sendMessage(ChatColor.translateAlternateColorCodes('&', Gloire.plugin.getConfig().getString("config.recompense_boost_journalier").replace("%s", Rank.getOfflinePlayerPrefix(Bukkit.getOfflinePlayer(playerUUID)))));
-
-                            // Récompense familier
-                            Bukkit.getOfflinePlayer(playerUUID).getPlayer().sendMessage(ChatColor.translateAlternateColorCodes('&', Gloire.plugin.getConfig().getString("config.recompense_familier")));
-
-                            // Récompense roulette
-                            Bukkit.getOfflinePlayer(playerUUID).getPlayer().sendMessage(ChatColor.translateAlternateColorCodes('&', Gloire.plugin.getConfig().getString("config.recompense_roulette")));
-
-                            // Récompense zone des boss
-                            Bukkit.getOfflinePlayer(playerUUID).getPlayer().sendMessage(ChatColor.translateAlternateColorCodes('&', Gloire.plugin.getConfig().getString("config.recompense_boss")));
-
-                            // Récompense seed
-                            Bukkit.getOfflinePlayer(playerUUID).getPlayer().sendMessage(ChatColor.translateAlternateColorCodes('&', Gloire.plugin.getConfig().getString("config.recompense_seed")));
-
-                            // Récompense quêtes
-                            Bukkit.getOfflinePlayer(playerUUID).getPlayer().sendMessage(ChatColor.translateAlternateColorCodes('&', Gloire.plugin.getConfig().getString("config.recompense_quetes_bonus")));
-                        } else if (rank == Rank.PREFIX_OVERLORD) {
-                            // Kit hebdomadaire
-                            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "kit Guerrier " + Bukkit.getOfflinePlayer(playerUUID).getPlayer().getName());
-
-                            // Glorium
-                            Material itemType = Material.matchMaterial("GLORE_LINGOT_GLORIUM");
-                            ItemStack itemStack = new ItemStack(itemType);
-                            Bukkit.getOfflinePlayer(playerUUID).getPlayer().getInventory().addItem(itemStack);
-
-                            // Récompense journalière boostée
-                            Bukkit.getOfflinePlayer(playerUUID).getPlayer().sendMessage(ChatColor.translateAlternateColorCodes('&', Gloire.plugin.getConfig().getString("config.recompense_boost_journalier").replace("%s", Rank.getOfflinePlayerPrefix(Bukkit.getOfflinePlayer(playerUUID)))));
-
-                            // Récompense familier
-                            Bukkit.getOfflinePlayer(playerUUID).getPlayer().sendMessage(ChatColor.translateAlternateColorCodes('&', Gloire.plugin.getConfig().getString("config.recompense_familier")));
-
-                            // Récompense roulette
-                            Bukkit.getOfflinePlayer(playerUUID).getPlayer().sendMessage(ChatColor.translateAlternateColorCodes('&', Gloire.plugin.getConfig().getString("config.recompense_roulette")));
-
-                            // Récompense zone des boss
-                            Bukkit.getOfflinePlayer(playerUUID).getPlayer().sendMessage(ChatColor.translateAlternateColorCodes('&', Gloire.plugin.getConfig().getString("config.recompense_boss")));
-
-                            // Récompense seed
-                            Bukkit.getOfflinePlayer(playerUUID).getPlayer().sendMessage(ChatColor.translateAlternateColorCodes('&', Gloire.plugin.getConfig().getString("config.recompense_seed")));
-
-                            // Récompense quêtes
-                            Bukkit.getOfflinePlayer(playerUUID).getPlayer().sendMessage(ChatColor.translateAlternateColorCodes('&', Gloire.plugin.getConfig().getString("config.recompense_quetes_bonus")));
-
-                            // Récompense césium
-
-                            // Récompense 100% boutique
-                            Bukkit.getOfflinePlayer(playerUUID).getPlayer().sendMessage(ChatColor.translateAlternateColorCodes('&', Gloire.plugin.getConfig().getString("config.recompense_100_boutique")));
-
-                            // Récompense particules
-                            Bukkit.getOfflinePlayer(playerUUID).getPlayer().sendMessage(ChatColor.translateAlternateColorCodes('&', Gloire.plugin.getConfig().getString("config.recompense_particules")));
-
-                            // Récompense Discord
-                            Bukkit.getOfflinePlayer(playerUUID).getPlayer().sendMessage(ChatColor.translateAlternateColorCodes('&', Gloire.plugin.getConfig().getString("config.recompense_discord")));
-                        } else if (rank == Rank.PREFIX_LEGENDAIRE) {
-                            // Kit hebdomadaire
-                            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "kit Guerrier " + Bukkit.getOfflinePlayer(playerUUID).getPlayer().getName());
-
-                            // Glorium
-                            Material itemType = Material.matchMaterial("GLORE_LINGOT_GLORIUM");
-                            ItemStack itemStack = new ItemStack(itemType);
-                            Bukkit.getOfflinePlayer(playerUUID).getPlayer().getInventory().addItem(itemStack);
-
-                            // Récompense journalière boostée
-                            Bukkit.getOfflinePlayer(playerUUID).getPlayer().sendMessage(ChatColor.translateAlternateColorCodes('&', Gloire.plugin.getConfig().getString("config.recompense_boost_journalier").replace("%s", Rank.getOfflinePlayerPrefix(Bukkit.getOfflinePlayer(playerUUID)))));
-
-                            // Récompense familier
-                            Bukkit.getOfflinePlayer(playerUUID).getPlayer().sendMessage(ChatColor.translateAlternateColorCodes('&', Gloire.plugin.getConfig().getString("config.recompense_familier")));
-
-                            // Récompense roulette
-                            Bukkit.getOfflinePlayer(playerUUID).getPlayer().sendMessage(ChatColor.translateAlternateColorCodes('&', Gloire.plugin.getConfig().getString("config.recompense_roulette")));
-
-                            // Récompense zone des boss
-                            Bukkit.getOfflinePlayer(playerUUID).getPlayer().sendMessage(ChatColor.translateAlternateColorCodes('&', Gloire.plugin.getConfig().getString("config.recompense_boss")));
-
-                            // Récompense seed
-                            Bukkit.getOfflinePlayer(playerUUID).getPlayer().sendMessage(ChatColor.translateAlternateColorCodes('&', Gloire.plugin.getConfig().getString("config.recompense_seed")));
-
-                            // Récompense quêtes
-                            Bukkit.getOfflinePlayer(playerUUID).getPlayer().sendMessage(ChatColor.translateAlternateColorCodes('&', Gloire.plugin.getConfig().getString("config.recompense_quetes_bonus")));
-
-                            // Récompense césium
-
-                            // Récompense 100% boutique
-                            Bukkit.getOfflinePlayer(playerUUID).getPlayer().sendMessage(ChatColor.translateAlternateColorCodes('&', Gloire.plugin.getConfig().getString("config.recompense_100_boutique")));
-
-                            // Récompense particules
-                            Bukkit.getOfflinePlayer(playerUUID).getPlayer().sendMessage(ChatColor.translateAlternateColorCodes('&', Gloire.plugin.getConfig().getString("config.recompense_particules")));
-
-                            // Récompense Discord
-                            Bukkit.getOfflinePlayer(playerUUID).getPlayer().sendMessage(ChatColor.translateAlternateColorCodes('&', Gloire.plugin.getConfig().getString("config.recompense_discord")));
-
-                            // Récompense bâton de sorcier
-                            Bukkit.getOfflinePlayer(playerUUID).getPlayer().sendMessage(ChatColor.translateAlternateColorCodes('&', Gloire.plugin.getConfig().getString("config.recompense_baton_sorcier")));
-
-                            // Récompense points boutique
-                            Bukkit.getOfflinePlayer(playerUUID).getPlayer().sendMessage(ChatColor.translateAlternateColorCodes('&', Gloire.plugin.getConfig().getString("config.recompense_points_boutique")));
-                        } else if (rank == Rank.PREFIX_DIVIN) {
-                            // Kit hebdomadaire
-                            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "kit Guerrier " + Bukkit.getOfflinePlayer(playerUUID).getPlayer().getName());
-
-                            // Glorium
-                            Material itemType = Material.matchMaterial("GLORE_LINGOT_GLORIUM");
-                            ItemStack itemStack = new ItemStack(itemType);
-                            Bukkit.getOfflinePlayer(playerUUID).getPlayer().getInventory().addItem(itemStack);
-
-                            // Récompense journalière boostée
-                            Bukkit.getOfflinePlayer(playerUUID).getPlayer().sendMessage(ChatColor.translateAlternateColorCodes('&', Gloire.plugin.getConfig().getString("config.recompense_boost_journalier").replace("%s", Rank.getOfflinePlayerPrefix(Bukkit.getOfflinePlayer(playerUUID)))));
-
-                            // Récompense familier
-                            Bukkit.getOfflinePlayer(playerUUID).getPlayer().sendMessage(ChatColor.translateAlternateColorCodes('&', Gloire.plugin.getConfig().getString("config.recompense_familier")));
-
-                            // Récompense roulette
-                            Bukkit.getOfflinePlayer(playerUUID).getPlayer().sendMessage(ChatColor.translateAlternateColorCodes('&', Gloire.plugin.getConfig().getString("config.recompense_roulette")));
-
-                            // Récompense zone des boss
-                            Bukkit.getOfflinePlayer(playerUUID).getPlayer().sendMessage(ChatColor.translateAlternateColorCodes('&', Gloire.plugin.getConfig().getString("config.recompense_boss")));
-
-                            // Récompense seed
-                            Bukkit.getOfflinePlayer(playerUUID).getPlayer().sendMessage(ChatColor.translateAlternateColorCodes('&', Gloire.plugin.getConfig().getString("config.recompense_seed")));
-
-                            // Récompense quêtes
-                            Bukkit.getOfflinePlayer(playerUUID).getPlayer().sendMessage(ChatColor.translateAlternateColorCodes('&', Gloire.plugin.getConfig().getString("config.recompense_quetes_bonus")));
-
-                            // Récompense césium
-
-                            // Récompense 100% boutique
-                            Bukkit.getOfflinePlayer(playerUUID).getPlayer().sendMessage(ChatColor.translateAlternateColorCodes('&', Gloire.plugin.getConfig().getString("config.recompense_100_boutique")));
-
-                            // Récompense particules
-                            Bukkit.getOfflinePlayer(playerUUID).getPlayer().sendMessage(ChatColor.translateAlternateColorCodes('&', Gloire.plugin.getConfig().getString("config.recompense_particules")));
-
-                            // Récompense Discord
-                            Bukkit.getOfflinePlayer(playerUUID).getPlayer().sendMessage(ChatColor.translateAlternateColorCodes('&', Gloire.plugin.getConfig().getString("config.recompense_discord")));
-
-                            // Récompense bâton de sorcier
-                            Bukkit.getOfflinePlayer(playerUUID).getPlayer().sendMessage(ChatColor.translateAlternateColorCodes('&', Gloire.plugin.getConfig().getString("config.recompense_baton_sorcier")));
-
-                            // Récompense points boutique
-                            Bukkit.getOfflinePlayer(playerUUID).getPlayer().sendMessage(ChatColor.translateAlternateColorCodes('&', Gloire.plugin.getConfig().getString("config.recompense_points_boutique")));
-
-                            // Récompense arthémite
-
-                            // Récompense livre Lightning
-                            Bukkit.getOfflinePlayer(playerUUID).getPlayer().sendMessage(ChatColor.translateAlternateColorCodes('&', Gloire.plugin.getConfig().getString("config.recompense_livre_lightning")));
-                        } else if (rank == Rank.PREFIX_TRANSCENDANT) {
-                            // Kit hebdomadaire
-                            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "kit Guerrier " + Bukkit.getOfflinePlayer(playerUUID).getPlayer().getName());
-
-                            // Glorium
-                            Material itemType = Material.matchMaterial("GLORE_LINGOT_GLORIUM");
-                            ItemStack itemStack = new ItemStack(itemType);
-                            Bukkit.getOfflinePlayer(playerUUID).getPlayer().getInventory().addItem(itemStack);
-
-                            // Récompense journalière boostée
-                            Bukkit.getOfflinePlayer(playerUUID).getPlayer().sendMessage(ChatColor.translateAlternateColorCodes('&', Gloire.plugin.getConfig().getString("config.recompense_boost_journalier").replace("%s", Rank.getOfflinePlayerPrefix(Bukkit.getOfflinePlayer(playerUUID)))));
-
-                            // Récompense familier
-                            Bukkit.getOfflinePlayer(playerUUID).getPlayer().sendMessage(ChatColor.translateAlternateColorCodes('&', Gloire.plugin.getConfig().getString("config.recompense_familier")));
-
-                            // Récompense roulette
-                            Bukkit.getOfflinePlayer(playerUUID).getPlayer().sendMessage(ChatColor.translateAlternateColorCodes('&', Gloire.plugin.getConfig().getString("config.recompense_roulette")));
-
-                            // Récompense zone des boss
-                            Bukkit.getOfflinePlayer(playerUUID).getPlayer().sendMessage(ChatColor.translateAlternateColorCodes('&', Gloire.plugin.getConfig().getString("config.recompense_boss")));
-
-                            // Récompense seed
-                            Bukkit.getOfflinePlayer(playerUUID).getPlayer().sendMessage(ChatColor.translateAlternateColorCodes('&', Gloire.plugin.getConfig().getString("config.recompense_seed")));
-
-                            // Récompense quêtes
-                            Bukkit.getOfflinePlayer(playerUUID).getPlayer().sendMessage(ChatColor.translateAlternateColorCodes('&', Gloire.plugin.getConfig().getString("config.recompense_quetes_bonus")));
-
-                            // Récompense césium
-
-                            // Récompense 100% boutique
-                            Bukkit.getOfflinePlayer(playerUUID).getPlayer().sendMessage(ChatColor.translateAlternateColorCodes('&', Gloire.plugin.getConfig().getString("config.recompense_100_boutique")));
-
-                            // Récompense particules
-                            Bukkit.getOfflinePlayer(playerUUID).getPlayer().sendMessage(ChatColor.translateAlternateColorCodes('&', Gloire.plugin.getConfig().getString("config.recompense_particules")));
-
-                            // Récompense Discord
-                            Bukkit.getOfflinePlayer(playerUUID).getPlayer().sendMessage(ChatColor.translateAlternateColorCodes('&', Gloire.plugin.getConfig().getString("config.recompense_discord")));
-
-                            // Récompense bâton de sorcier
-                            Bukkit.getOfflinePlayer(playerUUID).getPlayer().sendMessage(ChatColor.translateAlternateColorCodes('&', Gloire.plugin.getConfig().getString("config.recompense_baton_sorcier")));
-
-                            // Récompense points boutique
-                            Bukkit.getOfflinePlayer(playerUUID).getPlayer().sendMessage(ChatColor.translateAlternateColorCodes('&', Gloire.plugin.getConfig().getString("config.recompense_points_boutique")));
-
-                            // Récompense arthémite
-
-                            // Récompense livre Lightning
-                            Bukkit.getOfflinePlayer(playerUUID).getPlayer().sendMessage(ChatColor.translateAlternateColorCodes('&', Gloire.plugin.getConfig().getString("config.recompense_livre_lightning")));
-
-                            // Récompense saison pass
-                            Bukkit.getOfflinePlayer(playerUUID).getPlayer().sendMessage(ChatColor.translateAlternateColorCodes('&', Gloire.plugin.getConfig().getString("config.recompense_saison_pass")));
+                        // On vérifie si le joueur est connecté
+                        if (Bukkit.getOfflinePlayer(playerUUID).isOnline() == true) {
+                            // le joueur est en ligne
+                            try {
+                                Bukkit.getOfflinePlayer(playerUUID).getPlayer().sendMessage(ChatColor.translateAlternateColorCodes('&', Gloire.plugin.getConfig().getString("config.fin_saison_award").replace("%s", Rank.getOfflinePlayerPrefix(Bukkit.getOfflinePlayer(playerUUID)))));
+                            } catch (NullPointerException e) {
+                                // Ne rien faire
+                            }
+                            sendBonus(playerUUID, rank.poids);
+                        } else {
+                            // Le joueur n'est pas en ligne, on ajoute son UUID/rang à la BDD, et il recevra ses récompenses à la prochaine connexion
+                            bdd.query("INSERT INTO `offlineBonusTable`(`uuid`, `poids`) VALUES ('" + playerUUID.toString() + "'," + rank.poids + ")", false);
                         }
                     }
+                    // Reset des points de Gloire
+                    bdd.query("UPDATE `statistiques` SET `gloire`=" + plugin.getConfig().getString("config.gloire_base") + " WHERE 1", false);
+                    Bukkit.getServer().broadcastMessage(ChatColor.translateAlternateColorCodes('&', plugin.getConfig().getString("config.broadcast_reset")));
+
                 }
             } catch (SQLException | ParseException throwables) {
                 throwables.printStackTrace();
             }
         }, 0, Long.parseLong(plugin.getConfig().getString("timer.schedule_check")));
+    }
+
+    public static void sendBonus(UUID _playerUUID, int poids) {
+
+        // ##########################################
+        // ### LISTE DES RECOMPENSES SE SITUE ICI ###
+        // ##########################################
+
+        // Poids <= 10 (AUCUN RANG)
+        if (poids >= 10) {
+            // Rien
+        }
+
+        // Poids <= 20 (TÉMÉRAIRE)
+        if (poids >= 20) {
+            // Kit hebdomadaire
+            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "kit Guerrier " + Bukkit.getOfflinePlayer(_playerUUID).getName());
+        }
+
+        // Poids <= 30 (TRIOMPHANT)
+        if (poids >= 30) {
+            // Glorium
+            Material itemType = Material.matchMaterial("GLORE_LINGOT_GLORIUM");
+            ItemStack itemStack = new ItemStack(itemType);
+            Bukkit.getOfflinePlayer(_playerUUID).getPlayer().getInventory().addItem(itemStack);
+
+            // Récompense journalière boostée
+            Bukkit.getOfflinePlayer(_playerUUID).getPlayer().sendMessage(ChatColor.translateAlternateColorCodes('&', Gloire.plugin.getConfig().getString("config.recompense_boost_journalier").replace("%s", Rank.getOfflinePlayerPrefix(Bukkit.getOfflinePlayer(_playerUUID)))));
+
+            // Récompense familier
+            Bukkit.getOfflinePlayer(_playerUUID).getPlayer().sendMessage(ChatColor.translateAlternateColorCodes('&', Gloire.plugin.getConfig().getString("config.recompense_familier")));
+        }
+
+        // Poids <= 40 (IMPITOYABLE)
+        if (poids >= 40) {
+            // Récompense roulette
+            Bukkit.getOfflinePlayer(_playerUUID).getPlayer().sendMessage(ChatColor.translateAlternateColorCodes('&', Gloire.plugin.getConfig().getString("config.recompense_roulette")));
+
+            // Récompense zone des boss
+            Bukkit.getOfflinePlayer(_playerUUID).getPlayer().sendMessage(ChatColor.translateAlternateColorCodes('&', Gloire.plugin.getConfig().getString("config.recompense_boss")));
+        }
+
+        // Poids <= 50 (GRAND)
+        if (poids >= 50) {
+            // Récompense seed
+            Bukkit.getOfflinePlayer(_playerUUID).getPlayer().sendMessage(ChatColor.translateAlternateColorCodes('&', Gloire.plugin.getConfig().getString("config.recompense_seed")));
+
+            // Récompense quêtes
+            Bukkit.getOfflinePlayer(_playerUUID).getPlayer().sendMessage(ChatColor.translateAlternateColorCodes('&', Gloire.plugin.getConfig().getString("config.recompense_quetes_bonus")));
+        }
+
+        // Poids <= 60 (OVERLORD)
+        if (poids >= 60) {
+            // Récompense césium
+
+            // Récompense 100% boutique
+            Bukkit.getOfflinePlayer(_playerUUID).getPlayer().sendMessage(ChatColor.translateAlternateColorCodes('&', Gloire.plugin.getConfig().getString("config.recompense_100_boutique")));
+
+            // Récompense particules
+            Bukkit.getOfflinePlayer(_playerUUID).getPlayer().sendMessage(ChatColor.translateAlternateColorCodes('&', Gloire.plugin.getConfig().getString("config.recompense_particules")));
+
+            // Récompense Discord
+            Bukkit.getOfflinePlayer(_playerUUID).getPlayer().sendMessage(ChatColor.translateAlternateColorCodes('&', Gloire.plugin.getConfig().getString("config.recompense_discord")));
+        }
+
+        // Poids <= 70 (LÉGENDAIRE)
+        if (poids >= 70) {
+            // Récompense bâton de sorcier
+            Bukkit.getOfflinePlayer(_playerUUID).getPlayer().sendMessage(ChatColor.translateAlternateColorCodes('&', Gloire.plugin.getConfig().getString("config.recompense_baton_sorcier")));
+
+            // Récompense points boutique
+            Bukkit.getOfflinePlayer(_playerUUID).getPlayer().sendMessage(ChatColor.translateAlternateColorCodes('&', Gloire.plugin.getConfig().getString("config.recompense_points_boutique")));
+        }
+
+        // Poids <= 80 (DIVIN)
+        if (poids >= 80) {
+            // Récompense arthémite
+
+            // Récompense livre Lightning
+            Bukkit.getOfflinePlayer(_playerUUID).getPlayer().sendMessage(ChatColor.translateAlternateColorCodes('&', Gloire.plugin.getConfig().getString("config.recompense_livre_lightning")));
+        }
+
+        // Poids <= 90 (TRANSCENDANT)
+        if (poids >= 90) {
+            // Récompense saison pass
+            Bukkit.getOfflinePlayer(_playerUUID).getPlayer().sendMessage(ChatColor.translateAlternateColorCodes('&', Gloire.plugin.getConfig().getString("config.recompense_saison_pass")));
+        }
     }
 
     @Override

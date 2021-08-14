@@ -100,9 +100,23 @@ public class EventListener implements Listener {
                 // Si joueur pas présent dans la BDD
                 if (result.size() == 0) {
                     bdd.query("INSERT INTO `statistiques`(`uuid`, `joueur`, `gloire`, `kills`, `morts`) VALUES ('" + event.getPlayer().getUniqueId().toString() + "','" + event.getPlayer().getName() + "','" + Gloire.plugin.getConfig().getString("config.gloire_base") + "', '0', '0')", false);
-                    }
+                }
 
+                // On charge le rang du joueur
                 Rank.loadRank(player);
+
+                // On vérifie qu'il n'a pas des bonus de fin de saison
+                ArrayList<String> resultBonus = bdd.query("SELECT `uuid`, `poids` FROM `offlineBonusTable` WHERE 1", true);
+
+                // On parcourt la liste
+                for (int i = 0; i < resultBonus.size(); i+=2) {
+                    // Le joueur a des bonus à recevoir
+                    if (resultBonus.get(i).equalsIgnoreCase(player.getUniqueId().toString())) {
+                        Gloire.sendBonus(player.getUniqueId(), Integer.valueOf(resultBonus.get(i+1)));
+                        // On supprime l'occurence dans la BDD
+                        bdd.query("DELETE FROM `offlineBonusTable` WHERE `uuid` = '" + player.getUniqueId().toString() + "'", false);
+                    }
+                }
             } catch (SQLException throwables) {
                 Bukkit.getServer().getLogger().warning("Erreur MySQL : " + throwables.getMessage());
                 Bukkit.getServer().getLogger().warning ("Impossible de se connecter à la base de données, veuillez vérifier les informations dans le fichier config.yml");

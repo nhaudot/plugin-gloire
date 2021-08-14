@@ -147,7 +147,7 @@ public class KillsListener implements Listener {
             else
             {
                 // Envoi requête SQL
-                entity.getKiller().sendMessage(event.getEntity().toString().toLowerCase().substring(5));
+                //entity.getKiller().sendMessage(event.getEntity().toString().toLowerCase().substring(5));
                 Bukkit.getScheduler().runTaskAsynchronously(Gloire.plugin, () -> {
                     try {
                         Database bdd = new Database(
